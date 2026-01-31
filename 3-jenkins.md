@@ -8,8 +8,8 @@ helm repo update
 kubectl create namespace jenkins
 
 #Install Jenkins with ingress enabled
-helm upgrade --install jenkins jenkins/jenkins \
-  --namespace jenkins \
+MSYS_NO_PATHCONV=1 helm upgrade --install jenkins jenkins/jenkins \
+  --namespace jenkins --create-namespace \
   --set controller.serviceType=ClusterIP \
   --set controller.ingress.enabled=true \
   --set controller.ingress.hostName=jenkins.local \
@@ -19,6 +19,7 @@ helm upgrade --install jenkins jenkins/jenkins \
   --set controller.admin.password=admin123 \
   --set persistence.enabled=false \
   --set controller.ingress.ingressClassName=nginx
+
 
 kubectl get pods -n jenkins
 
@@ -34,4 +35,25 @@ kubectl create serviceaccount jenkins-sa -n jenkins
 kubectl create clusterrolebinding jenkins-sa-binding \
   --clusterrole=cluster-admin \
   --serviceaccount=jenkins:jenkins-sa
+```
+```bash
+$ kubectl get pod jenkins-0 -n jenkins -oyaml | grep -i serviceaccount
+  automountServiceAccountToken: true
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+  serviceAccount: jenkins
+  serviceAccountName: jenkins
+      - serviceAccountToken:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+```
+```bash
+#Install plugins
+1. HashiCorp Vault
+2. Pipeline: Stage View
+
 ```
