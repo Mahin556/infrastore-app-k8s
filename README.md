@@ -27,6 +27,8 @@ kubectl exec -it deploy/demo-infrastore-deployment -- python manage.py createsup
 username: admin
 password: secret23
 
+echo '127.0.0.1 infrastore.local' >> /etc/hosts
+
 $ curl -X POST http://infrastore.local/api/token/   -H "Content-Type: application/json"   -d '{"username":"admin","password":"secret123"}'
 {"token":"19542a15d5b52f46562613c302fa1a975064fc75"}
 
