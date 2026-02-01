@@ -103,3 +103,66 @@ subjects:
 - kind: ServiceAccount
   name: jenkins
 ```
+```bash
+# ADD HASHICORP VAULT TO JENKINS (SIMPLE STEP-BY-STEP)
+
+# Install Plugin
+#   Jenkins Dashboard → Manage Jenkins → Manage Plugins
+#   Install: "HashiCorp Vault Plugin"
+#   Restart Jenkins
+
+# Add Vault Server (Endpoint)
+#   Manage Jenkins → Configure System
+#   Scroll to "HashiCorp Vault"
+
+#   Fill:
+#   - Vault URL: http://<VAULT-IP>:8200
+#   - Engine Version: 2  (for KV v2 secrets)
+#   - Skip SSL Verify: ✔ (only for lab)
+
+# Add Credentials (How Jenkins Logs into Vault)
+#   Click "Add" under Credentials
+
+#   Choose ONE auth method:
+
+#  🔹 Option A — Token (easy for lab)
+#       Kind: "Vault Token Credential"
+#       Token: <your-vault-token>
+#       ID: vault-token
+
+#  🔹 Option B — AppRole (best practice)
+#       Kind: "Vault App Role Credential"
+#       Role ID: <role_id>
+#       Secret ID: <secret_id>
+#       Path: approle
+#       ID: vault-approle
+
+# Attach Credential to Vault Config
+#   In Vault config section:
+#   - Choose Credential you created (vault-token or vault-approle)
+#   - Save
+
+# Store Secret in Vault
+#   Example (KV v2):
+#   Path: secret/infrastore-app
+
+#   Key: DJANGO_SUPERUSER_PASSWORD
+#   Value: supersecret123
+
+# Use in Jenkins Pipeline
+
+  withVault([
+    configuration: [engineVersion: 2],
+    vaultSecrets: [[
+      path: 'secret/infrastore-app',
+      secretValues: [[envVar: 'DJANGO_PASSWORD', vaultKey: 'DJANGO_SUPERUSER_PASSWORD']]
+    ]]
+  ]) {
+    sh 'echo $DJANGO_PASSWORD'
+  }
+
+# What Happens
+#   Vault → Jenkins → Env Variable → Used in Helm/K8s/App
+
+# Done — Jenkins can now securely fetch secrets from Vault
+```
