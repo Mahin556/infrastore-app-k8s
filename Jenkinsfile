@@ -16,19 +16,19 @@ spec:
     }
   }
 
-  stages {
-    stage('Checkout Helm Chart') {
-      steps {
-        checkout([$class: 'GitSCM',
-          branches: [[name: '*/1']],
-          userRemoteConfigs: [[
-            url: 'https://github.com/Mahin556/infrastore-app-k8s.git',
-            credentialsId: 'git-creds'
-          ]]
-        ])
-        sh 'ls -la'
-      }
-    }
+  // stages {
+  //   stage('Checkout Helm Chart') {
+  //     steps {
+  //       checkout([$class: 'GitSCM',
+  //         branches: [[name: '*/1']],
+  //         userRemoteConfigs: [[
+  //           url: 'https://github.com/Mahin556/infrastore-app-k8s.git',
+  //           credentialsId: 'git-creds'
+  //         ]]
+  //       ])
+  //       sh 'ls -la'
+  //     }
+  //   }
 
     stage('Deploy Application') {
       steps {
