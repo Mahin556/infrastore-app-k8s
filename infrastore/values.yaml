@@ -54,7 +54,7 @@ storageClass:
   enabled: true
   name: hostpath1
   isDefault: false
-  provisioner: docker.io/hostpath
+  provisioner: rancher.io/local-path
   reclaimPolicy: Delete
   volumeBindingMode: WaitForFirstConsumer
 
