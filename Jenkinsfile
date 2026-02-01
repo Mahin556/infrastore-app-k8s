@@ -43,6 +43,7 @@ spec:
             echo "Fetched secret from Vault: $DJANGO_PASSWORD"
             helm upgrade --install infrastore-app infrastore \
               --namespace appns --create-namespace \
+              --set storageClass.provisioner="rancher.io/local-path" \
               --set-string secret.DJANGO_SUPERUSER_PASSWORD="$DJANGO_PASSWORD"
           '''
         }
