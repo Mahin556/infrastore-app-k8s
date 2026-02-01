@@ -57,4 +57,8 @@ helm upgrade --install testapp infrastore \
 
 ### References:
 * https://kind.sigs.k8s.io/docs/user/quick-start/
-* 
+* https://registry.terraform.io/providers/tehcyx/kind/latest/docs
+* https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs
+* https://registry.terraform.io/providers/hashicorp/helm/latest/docs
+* https://registry.terraform.io/providers/hashicorp/null/latest/docs
+* https://nickjanetakis.com/blog/configuring-a-kind-cluster-with-nginx-ingress-using-terraform-and-helm
