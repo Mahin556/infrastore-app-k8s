@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "infrastore.fullname" . }}-deployment
+  labels:
+    {{- include "labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      {{- include "labels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "labels" . | nindent 8 }}
+        app.kubernetes.io/version: {{ .Values.image.tag }}
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
+    spec:
+      serviceAccountName: {{ include "infrastore.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          env:
+          - name: DJANGO_SUPERUSER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "infrastore.fullname" . }}-secret
+                key: DJANGO_SUPERUSER_PASSWORD
+
+          ports:
+            - name: {{ .Values.service.name }}
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- if .Values.persistence.volumes }}
+          {{- $root := . }}
+          {{- $hasVolume := false }}
+          {{- range $name, $conf := $root.Values.persistence.volumes }}
+          {{- if $conf.enabled }}{{- $hasVolume = true }}{{- end }}
+          {{- end }}
+          {{- if $hasVolume }}
+          volumeMounts:
+            {{- range $name, $conf := $root.Values.persistence.volumes }}
+            {{- if $conf.enabled }}
+            - name: {{ $name }}
+              mountPath: {{ $conf.mountPath }}
+            {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- end }}
+
+      {{- if .Values.persistence.volumes }}
+      {{- $root := . }}
+      {{- $hasVolume := false }}
+      {{- range $name, $conf := $root.Values.persistence.volumes }}
+      {{- if $conf.enabled }}{{- $hasVolume = true }}{{- end }}
+      {{- end }}
+      {{- if $hasVolume }}
+      volumes:
+        {{- range $name, $conf := $root.Values.persistence.volumes }}
+        {{- if $conf.enabled }}
+        - name: {{ $name }}
+          persistentVolumeClaim:
+            claimName: {{ $root.Release.Name }}-{{ $root.Values.app_name }}-{{ $name }}
+        {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- end }}
+
+

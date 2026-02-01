@@ -1,0 +1,89 @@
+replicaCount: 2
+app_name: "infrastore"
+environment: "development"
+image:
+  repository: mahinraza556/infrastore
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+secret:
+  DJANGO_SUPERUSER_PASSWORD: ""
+
+service:
+  name: http
+  type: ClusterIP
+  targetPort: 8000
+  port: 80
+
+livenessProbe:
+  tcpSocket:
+    port: 8000 
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+readinessProbe:
+  tcpSocket:
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+persistence:
+  volumes:
+    db:
+      enabled: true
+      size: 1Gi
+      mountPath: /app/db
+    media:
+      enabled: true
+      size: 1Gi
+      mountPath: /app/media
+
+storageClass:
+  enabled: true
+  name: hostpath1
+  isDefault: false
+  provisioner: docker.io/hostpath
+  reclaimPolicy: Delete
+  volumeBindingMode: WaitForFirstConsumer
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+
+ingress:
+  enabled: true
+  className: nginx
+  host: infrastore.local
+  path: /
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+
+serviceAccount:
+  create: true
+  name: ""
+  automount: true
+  annotations: {}
+
+rbac:
+  create: true
+  rules:
+    - apiGroups: [""]
+      resources: ["pods"]
+      verbs: ["get", "list"]
+    - apiGroups: [""]
+      resources: ["secrets"]
+      verbs: ["get"]

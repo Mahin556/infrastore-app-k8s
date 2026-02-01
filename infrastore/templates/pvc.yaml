@@ -1,0 +1,25 @@
+{{- $root := . }}
+{{- range $name, $conf := $root.Values.persistence.volumes }}
+{{- if $conf.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $root.Release.Name }}-{{ $root.Values.app_name }}-{{ $name }}
+  labels:
+    {{- include "labels" $root | nindent 4 }}
+spec:
+  {{- with $root.Values.storageClass.name }}
+  storageClassName: {{ . }}
+  {{- end }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ $conf.size }}
+
+---
+{{- end }}
+{{- end }}
+
+
+
