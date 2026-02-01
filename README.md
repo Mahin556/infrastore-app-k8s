@@ -51,3 +51,8 @@ helm upgrade --install testapp infrastore \
   --namespace appns --create-namespace \
   --set-string secret.DJANGO_SUPERUSER_PASSWORD="$DJANGO_PASSWORD"
 ```
+
+
+### References:
+* https://kind.sigs.k8s.io/docs/user/quick-start/
+* 
