@@ -16,7 +16,7 @@ spec:
     }
   }
 
-  // stages {
+  stages {
   //   stage('Checkout Helm Chart') {
   //     steps {
   //       checkout([$class: 'GitSCM',
