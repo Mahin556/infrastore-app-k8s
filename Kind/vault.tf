@@ -22,16 +22,14 @@ resource "vault_auth_backend" "kubernetes" {
   depends_on = [ helm_release.vault ]
 }
 
-data "kubernetes_service" "kubernetes" {
-  metadata {
-    name      = "kubernetes"
-    namespace = "default"
-  }
-}
+data "kubernetes_client_config" "current" {}
+
 
 resource "vault_kubernetes_auth_backend_config" "k8s" {
   backend            = vault_auth_backend.kubernetes.path
-  kubernetes_host    = data.kubernetes_service.kubernetes.spec[0].cluster_ip
+  kubernetes_host    = data.kubernetes_client_config.current.host
+  kubernetes_ca_cert = base64decode(data.kubernetes_client_config.current.cluster_ca_certificate)
+  token_reviewer_jwt = data.kubernetes_client_config.current.token
 }
 
 resource "vault_kv_secret_v2" "django_password" {
