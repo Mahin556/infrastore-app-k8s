@@ -21,3 +21,14 @@ variable "ingress_nginx_namespace" {
   description = "The nginx ingress namespace (it will be created if needed)."
   default     = "ingress-nginx"
 }
+
+variable "hashicorp_vault_helm_version" {
+  type = string
+  default = "0.32.0"
+  description = "The Helm version for the hashicorp vault controller."
+}
+
+variable "hashicorp_vault_namespace" {
+  type = string
+  default = "vault"
+}
